@@ -1,40 +1,50 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
-class Document_Creator(ABC):
+import pydantic
+
+
+class DocumentFactory(ABC):
     @abstractmethod
-    def create_document(self):
+    def create_document(self, value: str):
         pass
 
-    def some_operation(self) -> str:
-        document = self.create_document()
-        result = f"Creator: The same creator's code has just worked with {document.operation()}"
-        return result
 
-class InvoiceCreator(Document_Creator):
-    def create_document(self) -> Document:
-        return InvoiceDocument()
+# Services
+class InvoiceFactory(DocumentFactory):
+    def create_document(self, value: str) -> Document:
+        # Here, we need to change
+        text = f"This is a single string ==> {value}"
+        return Document(content=text)
 
-class ShippingLabelCreator(Document_Creator):
-    def create_document(self) -> Document:
-        return ShippingLabelDocument()
 
-class Document(ABC):
-    @abstractmethod
-    def get(self) -> str:
-        pass
+class ShippingLabelFactory(DocumentFactory):
+    def create_document(self, value: str) -> Document:
+        # We need to create a zpl code
+        text = f'This is a binary data ==> {value}'
+        return Document(content=text)
 
-class InvoiceDocument(Document):
-    def get(self) -> str:
-        return "Invoice creado."
 
-class ShippingLabelDocument(Document):
-    def get(self) -> str:
-        return "Shipping label creado"
+# Object domain
+class Document(pydantic.BaseModel):
+    content: str | bytes
 
-def document_logic(document_creator: Document_Creator) -> None:
-    var = document_creator.create_document()
-    print(var)
+
+# class InvoiceDocument(Document):
+#     def __init__(self, content):
+#
+#     def get(self) -> str:
+#         return "Invoice created.."
+#
+#
+# class ShippingLabelDocument(Document):
+#     def get(self) -> str:
+#         return "Shipping label created"
+
 
 if __name__ == "__main__":
- document_logic(InvoiceCreator())
+    """Service"""
+    invoice = InvoiceFactory()
+    shipping_label = ShippingLabelFactory()
+    print(f'This is a Invoice ==> {invoice.create_document("INVOICE TEST")}')
+    print(f'This is a Shipping Label ==> {shipping_label.create_document("SHIPPING LABEL TEST")}')
