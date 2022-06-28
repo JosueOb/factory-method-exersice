@@ -1,5 +1,4 @@
-from unittest.mock import patch
-from main import InvoiceFactory, ShippingLabelFactory, Document
+from temp.exercise.main import InvoiceFactory, ShippingLabelFactory, Document
 
 
 def test_invoice_factory():
